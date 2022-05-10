@@ -1,7 +1,7 @@
 site_name: Paper Reading
 
-repo_name: 
-repo_url: 
+repo_name: PaperReading
+repo_url: https://github.com/tcmyxc/PaperReading
 
 theme:
   name: material
