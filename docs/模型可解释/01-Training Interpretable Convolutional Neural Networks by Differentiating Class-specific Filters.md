@@ -1,5 +1,11 @@
 # Training Interpretable Convolutional Neural Networks by Differentiating Class-specific Filters
 
+论文地址：https://arxiv.org/abs/2007.08194
+
+官方源码：https://github.com/hyliang96/CSGCNN
+
+> 在最后一层卷积层之后，FC层之前学习一个mask，该 mask 可以让引导网络学习类特定的卷积核。为了保证 mask 的稀疏性，使用了 L1 正则
+
 ## 摘要
 
 cnn通常被视为 “黑匣子”，缺乏可解释性。一个主要原因是由于卷积核和类之间错综复杂的多对多对应关系。大多数现有作品都尝试对预先训练的模型进行事后解释，而忽略了减少模型背后的纠缠。相反，**我们专注于减轻训练过程中的卷积核类纠缠**。
@@ -160,6 +166,56 @@ CSG给我们的启示是，具有跨类特征的硬样本往往会被错误分�
 类间过滤器近似正交且冗余较少，并且类特定过滤器产生高度类相关的表示。
 
 基于过滤器相关性，我们进一步发现用 CSG 训练的过滤器产生高度与类相关的表示，即图像的表示往往与其标记的类而不是其他类完全对应。 因为隐含的类主要决定了哪些过滤器被激活最多，同时这些过滤器被其他类激活较少，与其他类的过滤器相关性较小。
+
+## 核心代码
+
+```python
+class LearnableMaskLayer(nn.Module):
+    def __init__(self, feature_dim, num_classes):
+        super(LearnableMaskLayer, self).__init__()
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
+        # 0.5 代表最开始这个卷积核跟类别相关的概率是五五开
+        self.mask = torch.nn.Parameter(torch.full((feature_dim,num_classes),0.5))
+
+    def get_channel_mask(self):
+        c_mask = self.mask
+        return c_mask
+
+    def get_density(self):
+        return torch.norm(self.mask, p=1)/torch.numel(self.mask)
+
+    def _icnn_mask(self, x, labels):
+        if self.training:
+            index_mask = torch.zeros(x.shape, device=x.device)
+            for idx, la in enumerate(labels):
+                index_mask[idx, :, :, :] = self.mask[:, la].view(-1, self.mask.shape[0], 1, 1)
+            return index_mask * x
+        else:
+            return x
+
+    def loss_function(self):
+        l1_reg = torch.norm(self.mask, p=1)
+        # 0.2 代表矩阵的压缩比。也就是说我们最多想让20%的卷积核被激活
+        l1_reg = torch.relu(l1_reg - torch.numel(self.mask) * 0.2)
+        return l1_reg
+
+    def clip_lmask(self):
+
+        lmask = self.mask
+        lmask = lmask / torch.max(lmask, dim=1)[0].view(-1, 1)
+        lmask = torch.clamp(lmask, min=0, max=1)
+        self.mask.data = lmask
+
+    def forward(self, x, labels, last_layer_mask=None):
+        if (last_layer_mask is not None):
+            self.last_layer_mask = last_layer_mask
+
+        x = self._icnn_mask(x, labels)
+
+        return x, self.loss_function()
+```
+
+
 
 
 
