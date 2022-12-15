@@ -1,0 +1,947 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
+    
+    
+      
+        <title>Faster R-CNN论文笔记 - Paper Reading</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.975780f9.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.2505c338.min.css">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="None" data-md-color-accent="None">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#faster-r-cnn" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Paper Reading" class="md-header__button md-logo" aria-label="Paper Reading" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Paper Reading
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Faster R-CNN论文笔记
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/tcmyxc/PaperReading" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    PaperReading
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Paper Reading" class="md-nav__button md-logo" aria-label="Paper Reading" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Paper Reading
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/tcmyxc/PaperReading" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    PaperReading
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        论文阅读笔记
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          图像分类
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="图像分类" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          图像分类
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E5%9B%BE%E5%83%8F%E5%88%86%E7%B1%BB/Non-Deep%20Network/" class="md-nav__link">
+        NON-DEEP NETWORKS
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E5%9B%BE%E5%83%8F%E5%88%86%E7%B1%BB/ShuffleNetV1/" class="md-nav__link">
+        CNN模型之ShuffleNet
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E5%9B%BE%E5%83%8F%E5%88%86%E7%B1%BB/ShuffleNetV2/" class="md-nav__link">
+        ShuffleNetV2
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E5%9B%BE%E5%83%8F%E5%88%86%E7%B1%BB/mobilenet/" class="md-nav__link">
+        轻量级网络-Mobilenet系列(v1,v2,v3)
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          模型可解释
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="模型可解释" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          模型可解释
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E6%A8%A1%E5%9E%8B%E5%8F%AF%E8%A7%A3%E9%87%8A/01-Training%20Interpretable%20Convolutional%20Neural%20Networks%20by%20Differentiating%20Class-specific%20Filters/" class="md-nav__link">
+        Training Interpretable Convolutional Neural Networks by Differentiating Class-specific Filters
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E6%A8%A1%E5%9E%8B%E5%8F%AF%E8%A7%A3%E9%87%8A/02-%E5%8F%AF%E8%A7%A3%E9%87%8A%E7%9A%84%E8%A7%A3%E8%80%A6%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/" class="md-nav__link">
+        Interpretable Neural Network Decoupling
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E6%A8%A1%E5%9E%8B%E5%8F%AF%E8%A7%A3%E9%87%8A/03-Finding%20Class%20Specific%20Filters%20in%20Deep%20CNNs/" class="md-nav__link">
+        Decomposing the Deep: Finding Class Specific Filters in Deep CNNs
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          目标检测
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="目标检测" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          目标检测
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-rcnn/" class="md-nav__link">
+        R-CNN论文简单解读
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-fast-rcnn/" class="md-nav__link">
+        Fast R-CNN论文简单解读
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-sppnet/" class="md-nav__link">
+        SPP-net论文笔记
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Faster R-CNN论文笔记
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Faster R-CNN论文笔记
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    引言
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    正文
+  </a>
+  
+    <nav class="md-nav" aria-label="正文">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rpn" class="md-nav__link">
+    RPN
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#anchors" class="md-nav__link">
+    Anchors
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    损失函数
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rpn_1" class="md-nav__link">
+    训练RPN网络
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fast-r-cnnrpn" class="md-nav__link">
+    Fast R-CNN和RPN的共享特征
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    实现细节
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-FPN/" class="md-nav__link">
+        FPN论文阅读
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-Cascade%20R-CNN/" class="md-nav__link">
+        Cascade R-CNN读书笔记
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          长尾学习
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="长尾学习" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          长尾学习
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E9%95%BF%E5%B0%BE%E5%AD%A6%E4%B9%A0/02-Decoupling%20Representation%20and%20Classifier%20for%20Long-Tailed%20Recognition/" class="md-nav__link">
+        Decoupling Representation and Classifier for Long-Tailed Recognition论文笔记
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E9%95%BF%E5%B0%BE%E5%AD%A6%E4%B9%A0/LRP/" class="md-nav__link">
+        On Pixel-Wise Explanations for Non-Linear Classifier Decisions by Layer-Wise Relevance Propagation
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    引言
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    正文
+  </a>
+  
+    <nav class="md-nav" aria-label="正文">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rpn" class="md-nav__link">
+    RPN
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#anchors" class="md-nav__link">
+    Anchors
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    损失函数
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rpn_1" class="md-nav__link">
+    训练RPN网络
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fast-r-cnnrpn" class="md-nav__link">
+    Fast R-CNN和RPN的共享特征
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    实现细节
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <a href="https://github.com/tcmyxc/PaperReading/edit/master/docs/目标检测/04-faster-rcnn.md" title="Edit this page" class="md-content__button md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+<h1 id="faster-r-cnn">Faster R-CNN论文笔记<a class="headerlink" href="#faster-r-cnn" title="Permanent link">&para;</a></h1>
+<h2 id="_1">引言<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>根据以往R-CNN系列的分析，现在影响网络性能的是候选区域提取的部分。比如SS算法，在CPU上处理一张图片大约要2秒。</p>
+<p>文中提出了一种算法的改进——使用卷积神经网络来生成候选区域，命名为<code>Region Proposal Networks (RPN)</code>。RPN共享现有的目标检测网络的卷积层。这种方法既优雅又高效，几乎是 <code>cost-free</code> 的（每张图片在测试时大约10ms）。</p>
+<blockquote>
+<p>使用VGG16作为主干网络，一秒大约处理5帧（张）图片</p>
+</blockquote>
+<p>文中观察到，<strong>基于区域的目标检测网络产生的特征图也可以用于生成候选区域</strong>。 在这些卷积特征图的基础上，通过增加一些额外的卷积层来构造一个RPN。添加的这些卷积层在特征图的每个位置同时进行区域边界的回归以及是否有对象的打分判定。</p>
+<p>RPN是一种全卷积网络(FCN)，可以通过端到端的训练，专门用于产生候选区域。 </p>
+<p>RPN的设计是为了有效地预测具有广泛尺寸和纵横比的候选区域。 与使用图像金字塔或滤波器金字塔的方法不同，文中引入了<strong>“锚框”</strong>的概念，在多个尺度和纵横比下作为参考。</p>
+<h2 id="_2">正文<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p><img alt="Faster R-CNN" src="../images/cf9c9a56c6474067b789b5aaff9dc51a.png" /></p>
+<p>网络分为两个模块：</p>
+<ol>
+<li>RPN</li>
+<li>Fast R-CNN</li>
+</ol>
+<h3 id="rpn">RPN<a class="headerlink" href="#rpn" title="Permanent link">&para;</a></h3>
+<p>RPN将任意大小的图像作为输入，然后输出一组矩形候选框，每个候选框都有一个对象性分数。</p>
+<p><img alt="RPN" src="../images/3d50b465838b440ba31a9d740a0f60cb.png" /></p>
+<p>为了生成候选框，文中在最后一个共享卷积层输出的卷积特征图后面接一个小型网络。 </p>
+<p>这个小型网络将特征图上的 n × n 窗口作为输入。 每个滑动窗口都映射到一个低维特征（ZF 为 256-d，VGG 为 512-d，随后是 ReLU 层）。 这个特征被输入到两个全连接层——一个回归层（reg）和一个分类层（cls）。 </p>
+<p>文中使用 n = 3，注意输入图像上的有效感受野很大（ZF 和 VGG 分别为 171 和 228 像素）。 由于小网络以滑动窗口方式运行，因此全连接层在所有空间位置之间共享。 这种架构自然是用一个 n×n 卷积层和两个同级 1×1 卷积层（分别用于 reg 和 cls）来实现的。</p>
+<blockquote>
+<p>这里的意思是说，用1 x 1 的卷积代替了全连接层</p>
+</blockquote>
+<h3 id="anchors">Anchors<a class="headerlink" href="#anchors" title="Permanent link">&para;</a></h3>
+<p>在每个滑动窗口的位置，同时预测多个候选区域，其中每个位置的最大的候选框的数量记为k。因此，reg层有4k个输出，cls层输出2k个分数（为每个候选框的有无对象的的概率，其实也可以只输出k个分数）。</p>
+<p>k个候选区域是k个锚框（参考框）的参数化表示。锚点以滑动窗口为中心，并与尺度和高宽比相关联。默认情况下，我们使用3个尺度和3个长宽比，在每个滑动位置产生k=9个锚框。对于大小为W×H的特征图，总共有WHk锚点。</p>
+<p>锚框是平移不变的。</p>
+<p>锚点设计提出了一种解决多尺度（和纵横比）的新方案。基于anchor的方法是建立在anchors金字塔上的，更具成本效益。 文中的方法使用多尺度和纵横比的锚框对边界框进行分类和回归，仅依赖于单一尺度的图像和特征图，并使用单一尺寸的过滤器（特征图上的滑动窗口）</p>
+<p>这种基于锚点的多尺度设计，可以简单地使用在单尺度图像上计算的卷积特征，就像 Fast R-CNN 检测器所做的那样。 多尺度锚框的设计是共享特征的关键组成部分。</p>
+<h3 id="_3">损失函数<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>训练RPN时，每个框都会有一个二分类的标签（有待检测的物体，标签为1，没有则为0）。</p>
+<p>分类成标签1（正样本）的标准：</p>
+<ol>
+<li>和真实的边界框的交并比（IoU）最大的那个或者那些</li>
+<li>和任意真实的边界框交并比大于0.7的那些（如果都小于0.7则条件一就显得很重要，不至于没有样本）</li>
+</ol>
+<p>如果和所有真实的边界框的交并比小于0.3，则为负样本。非正非负的锚框直接扔掉。</p>
+<p><img alt="损失函数" src="../images/db1a244b3a15474081e8f1b50a037651.png" /></p>
+<p><span class="arithmatex">\(i\)</span> 是锚框的索引，<span class="arithmatex">\(p_i\)</span>是锚框<span class="arithmatex">\(i\)</span>里面是否有感兴趣对象的预测值。<span class="arithmatex">\(p_i^*\)</span>是真值（如果锚框是正样本，则为1，负样本为0）。<span class="arithmatex">\(t_i\)</span>是预测出现的边界框的参数化表示，是一个4维的向量。<span class="arithmatex">\(t_i^*\)</span>是边界框真实值的参数化表示。</p>
+<p>其他细节：</p>
+<p><img alt="损失函数超参数细节" src="../images/7f31230c84b744dfadecf19ee95ab096.png" /></p>
+<p>坐标参数化表示的细节：</p>
+<p><img alt="坐标参数化表示" src="../images/cdb4c0f177c44dcd986d4d6736a953e5.png" /></p>
+<p>可以看做是锚框向真实边界框进行回归</p>
+<blockquote>
+<p>也可以看做是平移加缩放的运算</p>
+</blockquote>
+<h3 id="rpn_1">训练RPN网络<a class="headerlink" href="#rpn_1" title="Permanent link">&para;</a></h3>
+<p>RPN可以通过反向传播和随机梯度下降(SGD)进行端到端的训练</p>
+<p>采样策略：以图像为中心</p>
+<p>考虑到单个图像会产生很多的负样本，对所有锚框的损失函数进行优化会导致网络偏向负样本。我们在一幅图像中随机采样256个锚框来计算一个小批量的损失函数，其中采样的正负锚框的锚框比高达1：1。 如果一幅图像中的正样本少于128个，我们就用负样本填充。 </p>
+<p>超参数设置：</p>
+<ol>
+<li>随机初始化所有的新层。随机值满足均值为0，方差为0.01的正态分布</li>
+<li>所有其他层使用ImageNet分类模型的预训练权重</li>
+<li>在VOC数据集上，对于前60K小批量，使用<code>1e-3</code>的学习率，对于接下来的20K小批量，使用<code>1e-4</code>的学习率</li>
+<li>动量为0.9，权重衰减<code>5e-4</code></li>
+</ol>
+<h3 id="fast-r-cnnrpn">Fast R-CNN和RPN的共享特征<a class="headerlink" href="#fast-r-cnnrpn" title="Permanent link">&para;</a></h3>
+<p>接下来描述由 RPN 和 Fast R-CNN 组成的统一网络的算法，该网络具有共享的卷积层</p>
+<p><img alt="Faster R-CNN" src="../images/0e3cd5b5d39a457b803e3d7d145bb73a.png" /></p>
+<p>独立训练的 RPN 和 Fast R-CNN 都会以不同的方式修改它们的卷积层。 因此需要开发一种技术，允许在两个网络之间共享卷积层，而不是学习两个单独的网络。 </p>
+<p>论文使用<strong>交替训练</strong>的方法。</p>
+<p>在这个方案中，我们首先训练 RPN，然后使用生成的候选区域来训练 Fast R-CNN。 然后用 Fast R-CNN 调优的网络来初始化 RPN，这个过程是迭代的。</p>
+<p>其他的训练方法：</p>
+<p><strong>近似联合训练</strong>。 在此解决方案中，RPN 和 Fast R-CNN 网络在训练期间合并为一个网络。在每次 SGD 迭代中，前向传递生成候选区域（这些区域在训练Fast R-CNN检测器时被视为固定的、预先计算的区域）。反向传播像往常一样发生，对于共享层，来自 RPN 的损失和 Fast R-CNN 损失的反向传播信号被组合在一起。 </p>
+<p>该解决方案易于实施。 但是这个解决方案忽略了候选框坐标的导数，所以是近似的。 在实验中，我们凭经验发现该方案产生了接近的结果，但与交替训练相比，训练时间减少了约 25-50%。 </p>
+<blockquote>
+<p>感觉这个好一点，虽然损失了部分精度，但是训练时间大幅减少</p>
+</blockquote>
+<p>4步交替训练。</p>
+<ol>
+<li>训练RPN。该网络使用ImageNet预训练模型进行初始化，并针对区域建议任务进行端到端微调。</li>
+<li>使用step-1 RPN生成的候选区域，通过Fast R-CNN训练一个单独的检测网络。该检测网络也由ImageNet预训练模型初始化。此时，两个网络不共享卷积层。</li>
+<li>使用检测器网络初始化RPN训练，但我们固定共享卷积层，只微调RPN特有的层。</li>
+<li>保持共享卷积层固定，对Fast R-CNN的唯一层进行微调。因此，两个网络共享相同的卷积层并形成统一的网络。</li>
+</ol>
+<p>类似的交替训练可以运行更多的迭代，但论文观察到改进几乎是忽略不计的。</p>
+<h3 id="_4">实现细节<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<ol>
+<li>单尺度训练加推理</li>
+<li>把图像的最短边缩放到600像素</li>
+<li>锚框使用三个尺度（128x128，256x256，512x512），每个尺度长宽比三个比例（1:1，1:2，2:1）</li>
+<li>不使用图像金字塔或者滤波器金字塔来预测区域的多个尺度（节省时间）</li>
+<li>训练期间忽略跨越边界的锚框，不然在训练期间不收敛（对于1000x600的图片，这样处理之后大约剩余6k个锚框）</li>
+<li>测试期间的跨边界的锚框，把超过边界的部分裁掉</li>
+<li>使用<code>NMS</code>在过滤部分锚框，阈值0.7（这样的话训练的时候还能剩下大约2k个候选框）</li>
+<li>在NMS之后，再挑选top-k个框（k=2k）。也就是说，训练的时候有2k个候选框，测试的时候不一定</li>
+</ol>
+<blockquote>
+<p>算法使用的锚框允许大于基础感受野。这样的预测并非不可能——如果只有物体的中间可见，人们仍然可以粗略地推断出物体的范围。</p>
+</blockquote>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../03-sppnet/" class="md-footer__link md-footer__link--prev" aria-label="Previous: SPP-net论文笔记" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              SPP-net论文笔记
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../05-FPN/" class="md-footer__link md-footer__link--next" aria-label="Next: FPN论文阅读" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              FPN论文阅读
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+    
+  </body>
+</html>

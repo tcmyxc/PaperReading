@@ -1,0 +1,773 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
+    
+    
+      
+        <title>轻量级网络-Mobilenet系列(v1,v2,v3) - Paper Reading</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.975780f9.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.2505c338.min.css">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="None" data-md-color-accent="None">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#-mobilenetv1v2v3" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Paper Reading" class="md-header__button md-logo" aria-label="Paper Reading" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Paper Reading
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              轻量级网络-Mobilenet系列(v1,v2,v3)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/tcmyxc/PaperReading" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    PaperReading
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Paper Reading" class="md-nav__button md-logo" aria-label="Paper Reading" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Paper Reading
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/tcmyxc/PaperReading" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    PaperReading
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        论文阅读笔记
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          图像分类
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="图像分类" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          图像分类
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Non-Deep%20Network/" class="md-nav__link">
+        NON-DEEP NETWORKS
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ShuffleNetV1/" class="md-nav__link">
+        CNN模型之ShuffleNet
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ShuffleNetV2/" class="md-nav__link">
+        ShuffleNetV2
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        轻量级网络-Mobilenet系列(v1,v2,v3)
+      </a>
+      
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          模型可解释
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="模型可解释" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          模型可解释
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E6%A8%A1%E5%9E%8B%E5%8F%AF%E8%A7%A3%E9%87%8A/01-Training%20Interpretable%20Convolutional%20Neural%20Networks%20by%20Differentiating%20Class-specific%20Filters/" class="md-nav__link">
+        Training Interpretable Convolutional Neural Networks by Differentiating Class-specific Filters
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E6%A8%A1%E5%9E%8B%E5%8F%AF%E8%A7%A3%E9%87%8A/02-%E5%8F%AF%E8%A7%A3%E9%87%8A%E7%9A%84%E8%A7%A3%E8%80%A6%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/" class="md-nav__link">
+        Interpretable Neural Network Decoupling
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E6%A8%A1%E5%9E%8B%E5%8F%AF%E8%A7%A3%E9%87%8A/03-Finding%20Class%20Specific%20Filters%20in%20Deep%20CNNs/" class="md-nav__link">
+        Decomposing the Deep: Finding Class Specific Filters in Deep CNNs
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          目标检测
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="目标检测" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          目标检测
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/01-rcnn/" class="md-nav__link">
+        R-CNN论文简单解读
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/02-fast-rcnn/" class="md-nav__link">
+        Fast R-CNN论文简单解读
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/03-sppnet/" class="md-nav__link">
+        SPP-net论文笔记
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/04-faster-rcnn/" class="md-nav__link">
+        Faster R-CNN论文笔记
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/05-FPN/" class="md-nav__link">
+        FPN论文阅读
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/06-Cascade%20R-CNN/" class="md-nav__link">
+        Cascade R-CNN读书笔记
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          长尾学习
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="长尾学习" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          长尾学习
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E9%95%BF%E5%B0%BE%E5%AD%A6%E4%B9%A0/02-Decoupling%20Representation%20and%20Classifier%20for%20Long-Tailed%20Recognition/" class="md-nav__link">
+        Decoupling Representation and Classifier for Long-Tailed Recognition论文笔记
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E9%95%BF%E5%B0%BE%E5%AD%A6%E4%B9%A0/LRP/" class="md-nav__link">
+        On Pixel-Wise Explanations for Non-Linear Classifier Decisions by Layer-Wise Relevance Propagation
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <a href="https://github.com/tcmyxc/PaperReading/edit/master/docs/图像分类/mobilenet.md" title="Edit this page" class="md-content__button md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+<h1 id="-mobilenetv1v2v3">轻量级网络-Mobilenet系列(v1,v2,v3)<a class="headerlink" href="#-mobilenetv1v2v3" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>原文链接：<a href="https://zhuanlan.zhihu.com/p/394975928">https://zhuanlan.zhihu.com/p/394975928</a></p>
+</blockquote>
+<p>本文主要介绍mobilenet系列：mobilenetV1、mobilenetV2、mobilenetV3三个特征提取网络。MobileNet模型是Google针对手机等嵌入式设备提出的一种轻量级的深层神经网络，其使用的<strong>核心思想</strong>便是<strong>depthwise separable convolution（深度可分离卷积）</strong>。</p>
+<p><strong>（1）什么是深度可分离卷积(Mobilenetv1提出)？</strong></p>
+<p>假设某一网络卷积层，其卷积核大小为3×3，输入通道为16，输出通道为32；</p>
+<p>常规卷积操作是将32个3×3×16的卷积核作用于16通道的输入图像，则根据卷积层参数量计算公式，<a href="https://zhuanlan.zhihu.com/p/395354063">卷积计算+卷积参数量+卷积计量量</a></p>
+<p>得到所需参数为32<em>(3</em>3*16+1)= 4640个。</p>
+<p>若先用16个、大小为3×3的卷积核(3<em>3</em>1)作用于16个通道的输入图像，得到了16个特征图，在做融合操作之前，接着用32个大小为1×1的卷积核(1<em>1</em>16)遍历上述得到的16个特征图，根据卷积层参数计算公式，所需参数为(3<em>3</em>1<em>16+16) + (1</em>1<em>16</em>32+32) = 706个。</p>
+<p>上述即为深度可分离卷积的作用，通俗的讲，普通卷积层的特征提取与特征组合一次完成并输出，而深度可分离卷积先用厚度为1的3<em>3的卷积核（</em><em>depthwise分层卷积</em><em>），再用1</em>1的卷积核(<strong>pointwise 卷积</strong>)调整通道数，将特征提取与特征组合分开进行。</p>
+<p>由此可以看出，深度可分离卷积可大大减少模型的参数，其具体结构如下图：</p>
+<p><img alt="img" src="../images/v2-f7c751dd3ab416c756f94c8076ca6cf1_720w.jpg" /></p>
+<p>左边为普通卷积层结构，右边为深度可分离卷积结构</p>
+<ul>
+<li>在进行 <strong>deepthwise(DW)</strong> 卷积时只使用了<code>一种</code>维度为<code>in_channels</code>的卷积核进行<strong>特征提取</strong>（没有进行特征组合）；</li>
+<li>在进行 <strong>pointwise(PW)</strong> 卷积时只使用了<code>output_channels 种</code> 维度为<code>in_channels</code> 1<em>1 的卷积核进行</em><em>特征组合。</em>*</li>
+</ul>
+<p><strong>(2）什么是Bottleneck layer(Resnet block提出)？</strong></p>
+<p>Bottleneck layer又称之为瓶颈层，使用的是1<em>1的卷积神经网络。使用<img alt="[公式]" src="images/times+1.svg+xml" />的网络结构，其目的是把高维特征映射到低维空间去。另外说一句，使用<img alt="[公式]" src="https://www.zhihu.com/equation?tex=1%5Ctimes+1" />的网络结构将高维空间映射到低纬空间的设计有的时候我们也称之为</em><em>Projection layer</em><em>（Mobilenetv2使用</em><em>）。</em>*</p>
+<p><img alt="img" src="../images/v2-f310844261647842ff1a39ef57b8c459_720w.jpg" /></p>
+<p>Bottleneck layer这种结构比较常见的出现地方就是ResNet block了，如下图。</p>
+<p><img alt="img" src="../images/v2-d192c65e76cc3da4e5d9a929434b0bed_720w.jpg" /></p>
+<p>没有bottleneck的ResNet residual block模块 有bottleneck的ResNetresidual block模块</p>
+<p><strong>(3)什么是bottleneck residual block（ResNet论文中的）？</strong></p>
+<p>bottleneck residual block的结构形状是中间窄两头胖，目的是加深网络、减少计算和参数量。</p>
+<p><img alt="img" src="../images/v2-9478a531528154914621efb1193cdc72_720w.jpg" />residual block 形状</p>
+<p><img alt="img" src="../images/v2-4881f4a70c6a0c5e22dd3c99e08dbe64_720w.jpg" /></p>
+<p>residual block 网络结构</p>
+<p><strong>(3）什么是 Expansion layer(Mobilenetv2提出)？</strong></p>
+<p><strong>Expansion layer</strong>的功能与<strong>Bottleneck layer</strong>正相反，使用<img alt="[公式]" src="https://www.zhihu.com/equation?tex=1%5Ctimes+1" />的网络结构，目的是将低维空间映射到高维空间。这里Expansion有一个超参数是维度扩展几倍。可以根据实际情况来做调整的，默认值是6，也就是扩展6倍。</p>
+<p><strong>(4）什么是 Inverted Residuals结构(Mobilenetv2提出)？</strong></p>
+<p>在MobileNetV2中的Inverted Residuals正好与ResNet的bottleneck residual block相反，其结构形状是中间胖两头窄。</p>
+<p>即：1、在可分离卷积的前面增加一个大小为1*1的卷积进行升维（Expansion layer）；2、将输入和输出的部分进行连接（residual connection）, 如下图所示。</p>
+<p><img alt="img" src="../images/v2-a5e97d4a55ff678beff0e8a1a02a47da_720w.jpg" /></p>
+<p>Inverted Residuals（中间大两头小)</p>
+<p><strong>(5) 什么是Linear Bottlenck结构(Mobilenetv2提出)？</strong></p>
+<p>由于DW、PW都是以Relu作为激活函数，且<strong>PW会做降维</strong>，<strong>再对低维特征做ReLU时会丢失很多信息，</strong>所以从高维向低维转换，使用ReLU激活函数可能会造成信息丢失或破坏（所以不使用非线性激活数函数），即在PW这一部分，我们不再使用ReLU激活函数而是使用线性激活函数，如下图。</p>
+<p><img alt="img" src="../images/v2-9130774b3524213dd091380cda345736_720w.jpg" /></p>
+<p><strong>【一、MobilenetV1】</strong></p>
+<p>论文地址：<a href="https://link.zhihu.com/?target=https%3A//arxiv.org/pdf/1704.04861.pdf">1704.04861.pdf (arxiv.org)</a></p>
+<ul>
+<li>引入了深度可分离卷积</li>
+<li>直筒结构（网络结构）</li>
+</ul>
+<p>MobileNetV1网络主要思路就是深度可分离卷积的堆叠。</p>
+<p><img alt="img" src="../images/v2-8d07209bbd6510085e91cad94d03dbd0_720w.jpg" /></p>
+<p>Mobilenetv1网络结构</p>
+<p><strong>【二、MobilenetV2】</strong></p>
+<p>论文地址：[<a href="https://link.zhihu.com/?target=https%3A//arxiv.org/abs/1801.04381">1801.04381] MobileNetV2: Inverted Residuals and Linear Bottlenecks (arxiv.org)</a></p>
+<p><img alt="img" src="../images/v2-63f1173d49863b1930910ddcaaa0245a_720w.jpg" /></p>
+<p>Mobilenetv2网络结构</p>
+<p>上图中，MobilenetV2 unit包含stride=1和stride=2两种。</p>
+<ul>
+<li>引入了bottleneck结构。</li>
+<li>将bottleneck结构变成了纺锤型，即resnet是先缩小为原来的&frac14;，再放大，他是放大到原来的6倍，再缩小。</li>
+<li>并且去掉了Residual Block最后的ReLU</li>
+</ul>
+<p><img alt="img" src="../images/v2-84f6b3ff07c92307cde66161e759cc49_720w.jpg" /></p>
+<p>MobilenetV2的主要改进是Linear Bottleneck 和 Inverted Residuals. 在MobilenetV2的网络设计中，作者除了继续使用深度可分离卷积结构之外，还使用了Expansion layer和 Projection layer。</p>
+<p><strong>为什么这么做？</strong>我们知道，如果tensor维度越低，卷积层的乘法计算量就越小。那么如果整个网络都是低维的tensor，那么整体计算速度就会很快。然而，如果只是使用低维的tensor效果并不会好。如果卷积层的过滤器都是使用低维的tensor来提取特征的话，那么就没有办法提取到整体的足够多的信息。所以，如果提取特征数据的话，我们可能更希望有高维的tensor来做这个事情，V2就设计这样一个结构来达到平衡。先通过Expansion layer来扩展维度，之后在用深度可分离卷积来提取特征，之后使用Projection layer来压缩数据，让网络从新变小。因为Expansion layer 和 Projection layer都是有可以学习的参数，所以整个网络结构可以学习到如何更好的扩展数据和从新压缩数据。</p>
+<p><strong>【三、MobilenetV3】</strong></p>
+<p>论文地址：<a href="https://link.zhihu.com/?target=https%3A//arxiv.org/abs/1905.02244">https://arxiv.org/abs/1905.02244</a></p>
+<p><img alt="img" src="../images/v2-020a1ce2a4c38dfa87f8d4803357a7ad_720w.jpg" /></p>
+<p>Mobilenetv3网络结构</p>
+<p>上图中，MobilenetV3 unit包含stride=1和stride=2两种。</p>
+<ul>
+<li>引入SE结构</li>
+<li>修改网络尾部结构</li>
+<li>修改channel数量</li>
+<li>非线性变换的改变</li>
+</ul>
+<p>在bottlenet结构中加入了SE结构，并且放在了depthwise filter之后，如下图。因为SE结构会消耗一定的时间，所以作者在含有SE的结构中，将expansion layer的channel变为原来的&frac14;,这样作者发现，即提高了精度，同时还没有增加时间消耗。并且SE结构放在了depthwise之后。</p>
+<p>在mobilenetv2中，在avg pooling之前，存在一个1x1的卷积层，目的是提高特征图的维度，更有利于结构的预测，但是这其实带来了一定的计算量了，所以这里作者修改了，将其放在avg pooling的后面，首先利用avg pooling将特征图大小由7x7降到了1x1，降到1x1后，然后再利用1x1提高维度，这样就减少了7x7=49倍的计算量。并且为了进一步的降低计算量，作者直接去掉了前面纺锤型卷积的3x3以及1x1卷积，进一步减少了计算量，就变成了如下图第二行所示的结构，作者将其中的3x3以及1x1去掉后，精度并没有得到损失。这里降低了大约15ms的速度。</p>
+<p>修改头部卷积核channel数量，mobilenet v2中使用的是32 x 3 x 3，作者发现，其实32可以再降低一点，所以这里作者改成了16，在保证了精度的前提下，降低了3ms的速度。</p>
+<p>使用h-swish替换swish，由于sigmoid的计算耗时较长，特别是在移动端，这些耗时就会比较明显，所以作者使用ReLU6(x+3)/6来近似替代sigmoid。<strong>利用ReLU有几点好处，1.可以在任何软硬件平台进行计算，2.量化的时候，它消除了潜在的精度损失，使用h-swish替换swith，在量化模式下回提高大约15%的效率，另外，h-swish在深层网络中更加明显。</strong></p>
+<p><img alt="img" src="../images/v2-3387887c00607f754ce5d5434c4185e2_720w.jpg" /></p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../ShuffleNetV2/" class="md-footer__link md-footer__link--prev" aria-label="Previous: ShuffleNetV2" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              ShuffleNetV2
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../../%E6%A8%A1%E5%9E%8B%E5%8F%AF%E8%A7%A3%E9%87%8A/01-Training%20Interpretable%20Convolutional%20Neural%20Networks%20by%20Differentiating%20Class-specific%20Filters/" class="md-footer__link md-footer__link--next" aria-label="Next: Training Interpretable Convolutional Neural Networks by Differentiating Class-specific Filters" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Training Interpretable Convolutional Neural Networks by Differentiating Class-specific Filters
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+    
+  </body>
+</html>

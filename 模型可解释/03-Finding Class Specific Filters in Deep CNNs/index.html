@@ -1,0 +1,995 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
+    
+    
+      
+        <title>Decomposing the Deep: Finding Class Specific Filters in Deep CNNs - Paper Reading</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.975780f9.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.2505c338.min.css">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="None" data-md-color-accent="None">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#decomposing-the-deep-finding-class-specific-filters-in-deep-cnns" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Paper Reading" class="md-header__button md-logo" aria-label="Paper Reading" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Paper Reading
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Decomposing the Deep: Finding Class Specific Filters in Deep CNNs
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/tcmyxc/PaperReading" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    PaperReading
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Paper Reading" class="md-nav__button md-logo" aria-label="Paper Reading" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Paper Reading
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/tcmyxc/PaperReading" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    PaperReading
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        论文阅读笔记
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          图像分类
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="图像分类" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          图像分类
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E5%9B%BE%E5%83%8F%E5%88%86%E7%B1%BB/Non-Deep%20Network/" class="md-nav__link">
+        NON-DEEP NETWORKS
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E5%9B%BE%E5%83%8F%E5%88%86%E7%B1%BB/ShuffleNetV1/" class="md-nav__link">
+        CNN模型之ShuffleNet
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E5%9B%BE%E5%83%8F%E5%88%86%E7%B1%BB/ShuffleNetV2/" class="md-nav__link">
+        ShuffleNetV2
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E5%9B%BE%E5%83%8F%E5%88%86%E7%B1%BB/mobilenet/" class="md-nav__link">
+        轻量级网络-Mobilenet系列(v1,v2,v3)
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          模型可解释
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="模型可解释" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          模型可解释
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-Training%20Interpretable%20Convolutional%20Neural%20Networks%20by%20Differentiating%20Class-specific%20Filters/" class="md-nav__link">
+        Training Interpretable Convolutional Neural Networks by Differentiating Class-specific Filters
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-%E5%8F%AF%E8%A7%A3%E9%87%8A%E7%9A%84%E8%A7%A3%E8%80%A6%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/" class="md-nav__link">
+        Interpretable Neural Network Decoupling
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Decomposing the Deep: Finding Class Specific Filters in Deep CNNs
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Decomposing the Deep: Finding Class Specific Filters in Deep CNNs
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    摘要
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    引言
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    相关工作
+  </a>
+  
+    <nav class="md-nav" aria-label="相关工作">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cnn" class="md-nav__link">
+    CNN 可解释性
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    本文贡献
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    背景
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    有影响的特征
+  </a>
+  
+    <nav class="md-nav" aria-label="有影响的特征">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#l1" class="md-nav__link">
+    重要特征的L1正则
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    分离输出
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    找相关特征
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    算法细节
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    实验
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    总结
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          目标检测
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="目标检测" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          目标检测
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/01-rcnn/" class="md-nav__link">
+        R-CNN论文简单解读
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/02-fast-rcnn/" class="md-nav__link">
+        Fast R-CNN论文简单解读
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/03-sppnet/" class="md-nav__link">
+        SPP-net论文笔记
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/04-faster-rcnn/" class="md-nav__link">
+        Faster R-CNN论文笔记
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/05-FPN/" class="md-nav__link">
+        FPN论文阅读
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/06-Cascade%20R-CNN/" class="md-nav__link">
+        Cascade R-CNN读书笔记
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          长尾学习
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="长尾学习" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          长尾学习
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E9%95%BF%E5%B0%BE%E5%AD%A6%E4%B9%A0/02-Decoupling%20Representation%20and%20Classifier%20for%20Long-Tailed%20Recognition/" class="md-nav__link">
+        Decoupling Representation and Classifier for Long-Tailed Recognition论文笔记
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E9%95%BF%E5%B0%BE%E5%AD%A6%E4%B9%A0/LRP/" class="md-nav__link">
+        On Pixel-Wise Explanations for Non-Linear Classifier Decisions by Layer-Wise Relevance Propagation
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    摘要
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    引言
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    相关工作
+  </a>
+  
+    <nav class="md-nav" aria-label="相关工作">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cnn" class="md-nav__link">
+    CNN 可解释性
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    本文贡献
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    背景
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    有影响的特征
+  </a>
+  
+    <nav class="md-nav" aria-label="有影响的特征">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#l1" class="md-nav__link">
+    重要特征的L1正则
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    分离输出
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    找相关特征
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    算法细节
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    实验
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    总结
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <a href="https://github.com/tcmyxc/PaperReading/edit/master/docs/模型可解释/03-Finding Class Specific Filters in Deep CNNs.md" title="Edit this page" class="md-content__button md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+<h1 id="decomposing-the-deep-finding-class-specific-filters-in-deep-cnns">Decomposing the Deep: Finding Class Specific Filters in Deep CNNs<a class="headerlink" href="#decomposing-the-deep-finding-class-specific-filters-in-deep-cnns" title="Permanent link">&para;</a></h1>
+<p>论文：<a href="https://arxiv.org/abs/2112.07719">https://arxiv.org/abs/2112.07719</a></p>
+<p>代码：<a href="https://github.com/akshaybadola/decomposing-the-deep">https://github.com/akshaybadola/decomposing-the-deep</a></p>
+<h2 id="_1">摘要<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>我们分析了深度卷积网络的最后一层和倒数第二层，并提供了一种有效的方法来识别对网络类别决策贡献最大的特征子集。 </p>
+<p>我们证明，与最后一层的维度相比，每个类的此类特征的数量要低得多，因此深度 CNN 的决策面位于低维流形上，并且与网络深度成正比。 </p>
+<p>我们的方法允许将最后一层分解为单独的子空间，与整个网络的最后一层相比，这些子空间更具可解释性并且计算成本更低。</p>
+<h2 id="_2">引言<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>大型网络可以包含数百万 [1]、[2] 到数十亿 [3]、[4] 的参数。 这些模型是高度过度参数化的，事实上，过度参数化对于它们的泛化能力至关重要 [5]、[6]、[7]。 在这种情况下，将任何网络的预测归因于其参数变得极其困难，这导致对网络的理解和可解释性较差。 这些模型缺乏可解释性使得人类很难在危急情况下信任它们，例如医疗诊断或自动驾驶汽车。 诊断和纠正模型本身也变得非常困难。</p>
+<p>CNN 的最后一层对可解释性特别感兴趣，因为那里出现的检测器更符合语义概念。 网络的最后一层通过 softmax 将特征投影到决策空间上，其属性对于网络预测的最终标签至关重要</p>
+<p>尽管最近在解释和解开神经网络特征方面开展了工作; 在当前的文献中，我们还没有遇到一种有效的方法来识别和排名最后和倒数第二层中的特征，从而分解该层。在这项工作中，<strong>我们将重点放在一些流行的CNN架构的最后和倒数第二层</strong>。我们说明了这些层的一些性质和这些层相关的特征，并提供了一种有效的方法来分解最终层，从而通过解纠缠产生可解释性，并降低了最终层的计算复杂性。</p>
+<h2 id="_3">相关工作<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>张等人 [10] 将可解释性定义为“以可理解的术语向人类提供解释的能力”。 然而，我们让人类来开发通信所需的术语，而是将可解释性定义为一种模型的表示，该模型易于检查、适应和归因。</p>
+<p>一个可解释的模型，特别是在我们的案例中是一个可解释的深度神经模型，应该易于检查、易于适应和易于归因。 特别是它应该促进：</p>
+<ol>
+<li>输入检查和归因：可解释的模型应该允许输入的部分与标签之间的对应关系。 为此目的，可以简化对应关系。 例如，在图像中，可以过滤对分类贡献更大的对象部分以进行检查和归因。 </li>
+<li>特征归因：可解释的模型应该允许输入到标签的中间表示之间的对应关系。  </li>
+<li>参数属性：一个可解释的模型应该允许模型的参数和输入标签决策过程之间的对应关系。 也就是说，哪些参数作用于输入的哪些部分以产生哪些标签应该是显而易见的。 同样，为了简化，可以减少归因的此类参数和输入部分的数量。</li>
+</ol>
+<p>对于任何模型，解释都应该导致模型参数对它做出的预测的某些归因。 这与将网络提炼成更可解释的模型（如决策树 [11]）是分开的，决策树 [11] 更倾向于将模型转换为更简单的模型，同时允许显着的准确性损失。 然而，<strong>模型解释（以及随之而来的简化）并不试图显着改变模型，而是在很大程度上试图保持模型的准确性</strong>。</p>
+<p>在 CNN 的上下文中，我们可以根据部分图像和作用于它们的滤波器组来解释它们； 因为深度 CNN 包含一个接一个堆叠的卷积滤波器组。 这些提供图像信号的局部线性加权平均的滤波器可以被认为是可解释性的，因为它们不是单独的权重，而是串联在输入和中间表示上。</p>
+<h3 id="cnn">CNN 可解释性<a class="headerlink" href="#cnn" title="Permanent link">&para;</a></h3>
+<p>在深度 CNN 中检查和迁移过滤器有足够的先前工作。 详细的调查在[10]中给出。 早期的工作如 [12]、[13]、[14] 分析了中间层中的过滤器，发现来自预训练神经网络的特征可用于其他任务。</p>
+<p>后来的工作更多地转向类属性和将特征与语义概念对齐。  Gonazelz-Garcia 等人。  [15] 和鲍等人。  [16] 分析了 CNN 的激活图，发现网络的最后一层比更适合检测纹理和颜色的早期层更接近语义概念。</p>
+<p>Network Dissection [16] 试图将 CNN 的激活图与语义概念相关联。 巴赫等。 人。  [17] 引入了相关传播的概念，并将图像中单个像素的贡献可视化。 亨德里克斯等。 人。  [18] 使用基于强化学习的损失函数来提供模型预测的自然语言解释。  Guillame 和 Bengio [19] 在每一层集成单独的线性分类器，以了解模型的决策过程。 张等。 人。  [20] 构建特定于零件的模板，并在 CNN 的训练期间将其合并以生成可解释的特征图。 梁等。 人。  [21] 使用稀疏性来找出 CNN 中的重要滤波器，尽管他们没有像 dropout 或量化 [22] 那样走向参数级稀疏性，而是将一个卷积滤波器视为单个参数。 其他一些方法，如 [23] 和 [24] 试图通过将滤波器建模为图形模型来估计滤波器的贡献。  [25]、[26] 中描述了类激活图的概念。 它试图识别 CNN 的判别区域，而 [27] 和 [28] 旨在对模型解释进行语言描述。</p>
+<p>一项平行的调查研究了 CNN 和稀疏 CNN 中的特征重要性。 刘等。 人。  [29] 在预训练的 CNN 中使用稀疏的低秩分解。 李等。 人。  [30] 使用 L1 正则的过滤器将卷积过滤器作为一个整体进行排名，并修剪不太重要的过滤器。 库马尔等人。  [31] 还使用带有上限的L1 范数来将 CNN 分类制定为类似套索的问题。 林等人。  [32] 引入了结构化的稀疏正则化。 李等人。  [33] 引入了一种核稀疏性和熵 (KSE) 度量，它可以量化卷积核的稀疏性和多样性。</p>
+<p>Wang 等人探讨了类特异性的概念。  [34]。 他们试图通过捕获特定类别的判别补丁的过滤器来提高准确性。 这些特定于类的过滤器与江等人的早期工作密切相关。  [35]，他们引入了标签一致神经网络的概念来学习他们声称减轻梯度消失并导致更快收敛的特征。 梁等人。  [21] 尝试使用稀疏性来找出他们声称也是特定于类的重要过滤器。</p>
+<p>我们的工作从 [30]、[34] 和 [21] 中汲取灵感。 我们结合了类特异性 [34]、[21] 和基于 L1 范数的过滤器重要性 [30] 的思想，得出了一种在最后一层和倒数第二层基于 L1 范数重要性标准来识别 k 个最有影响力特征的方法 CNN，并通过在各种 CNN 上的实验证明其有效性。</p>
+<h3 id="_4">本文贡献<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<p>1.我们证明，每个类别只需要几个过滤器就可以决策。</p>
+<p>2.我们提供了一种算法，用于从具有单个完全连接层的任何预训练网络中获取那些过滤器。</p>
+<p>3.我们演示了cnn中深度与滤波器解纠缠之间的关系，并表明更深的网络会导致最终层中的低维表示。</p>
+<p>4.我们证明这些过滤器与图像中的对象具有更大的对应关系，并且对于该类的分类至关重要。</p>
+<h2 id="_5">背景<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>如前所述，CNN 中的特征和层数之多使得它们很难解释。 一种解释它们的方法是过滤器解缠结。  Filter Disentanglement 指的是 CNN 中的过滤器应该代表不同的概念。 由于网络中的概念难以识别，我们可以改为<strong>使用过滤器对标签预测的归因作为解缠结的替代度量</strong>。 理想情况下，每个过滤器都应该负责检测图像中的特定模式，但这在实践中是困难的。 特别是在底层，过滤器高度纠缠并学习非常通用的特征[16]。 随着我们在网络中向上移动，在顶层，它们的纠缠度往往会降低，但并非完全如此。</p>
+<h2 id="_6">有影响的特征<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<p>倒数第二层和最后一层对神经网络中的特征属性特别感兴趣，因为它们包含图像的最终表示并直接导致标签的预测，而较低层学习响应纹理和较低级别特征的滤波器[16]。在这里，我们描述了确定最后一层中的影响特征的各种因素。</p>
+<h3 id="l1">重要特征的L1正则<a class="headerlink" href="#l1" title="Permanent link">&para;</a></h3>
+<p>以前 [30] 和 [21] 都使用 L1 范数来估计过滤器的重要性。然而，诸如上述两个的早期作品并没有明确地发现低维决策面。在 [30] 和 [21] 之后，我们将每个类别的结果特征的 L1 范数视为主要的区分因素。</p>
+<p>一种方法是检查最终层和预最终层中权重的L1范数，类似于[21]。然而，我们可以注意到，对于每个类，权重的L1范数不会变化，因此很难用它来识别类特定的特征。</p>
+<p>我们做出的另一个关键观察是，由于 RELU，整个 CNN 中的所有特征都≥ 0。实际上，特征向量/张量是半正定的，这意味着每个特征的 L1 范数直接有助于最后一层的分类输出。另一方面，权重大约为 50% ≥ 0 和 50% ≤ 0，因此用 L1 范数来量化特征重要性比权重重要性更容易。</p>
+<h3 id="_7">分离输出<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<p>我们的第二个见解是，每个类的最终层输出是该类的特征和该类的权重之间的点积的结果。 因此，最后一层可以被认为是 c 个单独的点积，其中 c 是类的数量。 因此，为每个类选择某些特征不会影响另一个类的输出。</p>
+<p>关注全连接层的权重，每一行相当于跟类别 <span class="arithmatex">\(i\)</span> 相关的权重</p>
+<h3 id="_8">找相关特征<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
+<p>我们注意到，找到特定于类的影响特征 <span class="arithmatex">\(\mathbf w_{k,i}\)</span> 并非易事，因为权重的确切子集不容易知道，并且穷举搜索具有指数复杂性。 然而，正如我们在 4.1 节中提到的 L1 正则可以帮助我们引导正确的过滤器集。</p>
+<p>在我们的实验中，我们发现虽然按 top L1 范数选择权重会导致权重归因，但不会导致特定类别的特征归因。 相反，使用 L1 范数搜索每个类的 topk 特征会给我们带来更好的结果。 即使将每个类别的 topk 过滤器与 topk 权重相结合，也会导致比每个类别的 topk 特征更差的结果。</p>
+<p>但是，一个问题是每个实例的特征在单个类中有所不同，并且无法提前知道实例的标签。 然而，从给定类中所有实例的 topk 特征直方图中选择的 topk 大多集中在几个点周围，这对应于这些有影响力的特征。 </p>
+<h3 id="_9">算法细节<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
+<p><img alt="算法流程" src="../../images/image-20220815102502727.png" /></p>
+<p>在这里，我们讨论从预训练的 CNN 中获取每个类的 k 个最有影响力的特征的算法</p>
+<p><span class="arithmatex">\(\mathcal{I}\)</span> 是最后一层所有类别的特征集。</p>
+<p>定义 <span class="arithmatex">\(I_{y}\)</span> 是类别 y 的特征集。我们想学习一个 <span class="arithmatex">\(y \rightarrow I_{y}\)</span> 的映射 <span class="arithmatex">\(\mathbb{I}\)</span>，也就是说，<span class="arithmatex">\(\mathbb{I}(y)\)</span> 会给出类别 <span class="arithmatex">\(y\)</span> 最有影响力的特征。</p>
+<p>我们通过在 pre-final 层的每个类的每个数据实例的 L1 范数来记录前 k1 个特征，并为类 y 选择一组 索引 <span class="arithmatex">\(I^{topk_{1}}_{y}\)</span>。 我们设置 k1远小于m，其中 m 是 pre-final 层的特征维度（因此也是最后一层的维度）。</p>
+<p>然后我们对每一个类，统计索引的频次，然后取 k2 个频数最高的。</p>
+<h2 id="_10">实验<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
+<p>我们整体观察到，通过减少最终层的输入特征数量来降低维度也会导致准确性降低。 这是可以预料的，因为我们在最后一层丢失了信息。 我们注意到，即使 k2 = 3，我们也能得到 84.16 的准确度，这对于每个类只有 3 个过滤器来说已经相当不错了。 这证实了决策表面位于比最终层的维度低得多的维度子空间上。</p>
+<p>我们可以注意到的另一件事是，对于给定的 k1 值，通过设置 k2 = k1 可以获得最佳结果。 此外，如果初始滤波器选择 k1 非常大，那么与较低的 k1 相比，等效的 k2 设置会导致较低的性能。</p>
+<p>使用有影响的特征进行预测的计算成本也较低，因为预测一个类只需要几个过滤器。 由于明确的类特定过滤器的识别，我们可以将最后一层分解为特定于类的子空间。 然后可以重新训练网络以恢复原始精度。 对于 Resnet20 和 CIFAR-10，精度下降到 88.59，具有影响的特征 k1 = k2 = 5。之后，我们可以分解最后一层，使每个类都有一个单独的特征子空间。 经过一个 epoch 的训练，我们得到了 91.51 的准确率。 </p>
+<h2 id="_11">总结<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
+<p>我们在这里描述了一种新方法，用于识别 CNN 最终层的 k 个最有影响力的特征。 该方法使我们对 CNN 具有更大的可解释性，并将最终层分解为单独的特定于类的最终层。 我们已经证明，这些特征对于给定标签的分类是必不可少的。 我们还表明，更深的网络在最终层中固有地具有更多解开的表示。 最后，我们还提供了实验的实现和分解的最终层计算。</p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../02-%E5%8F%AF%E8%A7%A3%E9%87%8A%E7%9A%84%E8%A7%A3%E8%80%A6%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Interpretable Neural Network Decoupling" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Interpretable Neural Network Decoupling
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../../%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/01-rcnn/" class="md-footer__link md-footer__link--next" aria-label="Next: R-CNN论文简单解读" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              R-CNN论文简单解读
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+    
+  </body>
+</html>
